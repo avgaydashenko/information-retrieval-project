@@ -12,7 +12,7 @@ class Robot:
         result = "{0.scheme}://{0.netloc}/".format(urlsplit(url))
         if result[:4] == 'www.':
             return result[4:]
-        else
+        else:
             return result
     
     def get_robots(self, url):
