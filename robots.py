@@ -8,6 +8,13 @@ class Robot:
     def get_domain(self, url):
         return "{0.scheme}://{0.netloc}/".format(urlsplit(url))
 
+    def get_name(self, url):
+        result = "{0.scheme}://{0.netloc}/".format(urlsplit(url))
+        if result[:4] == 'www.':
+            return result[4:]
+        else
+            return result
+    
     def get_robots(self, url):
         return self.get_domain(url) + 'robots.txt'
 
