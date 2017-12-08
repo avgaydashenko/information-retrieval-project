@@ -1,6 +1,9 @@
+import pickle
+
 class Ranging:
-    def __init__(self):
-        pass
+    def __init__(self, path_to_index='bm.pickle'):
+        with open(path_to_index, 'rb') as f:
+            self.index = pickle.load(f)
 
     def process_query(self, query):
         return [{'title': 'Im Fadenkreuz von politischer Polizei und Geheimdiensten: Albert Einstein',

@@ -58,7 +58,7 @@ class Interface(BaseWidget):
         if e.key() == QtCore.Qt.Key_Return:
 
             query = query_words(self._query.value)
-            self._pages_displayed, self._papers_displayed = process_query(self._query.value)
+            self._pages_displayed, self._papers_displayed = process_query(query)
 
             self._pages_result.clear()
             self._pages_result.value = [(QtGui.QLabel(format_text(query, document)),)
