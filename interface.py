@@ -19,17 +19,30 @@ def query_words(query):
     return set([stemmer.stem(word).encode("utf8") for word in query.lower().split(' ')])
 
 
-def format_text(query, document):
+def format_text(query, document, intent, num_words_to_show=10):
     title = '<span style="font-size:15pt; color: blue">' + document['title'] + '</span>'
     url = '<span style="color: green">' + document['url'] + '</span>'
     content = []
     stemmer = PorterStemmer()
-    for word in document['content'].split(' '):
+    relevance = []
+    for num, word in enumerate(document['content'].split(' ')):
         if stemmer.stem(word.lower()).encode("utf8") in query:
             content.append('<span style="background-color: #ffffcc">' + word + '</span>')
+            relevance.append(1)
         else:
             content.append(word)
-    return '<br>{title}<br>{url}<br>{content}<br>'.format(title=title, url=url, content=' '.join(content))
+            relevance.append(0)
+    max_rel = 0
+    max_rel_ind = -1
+    curr_rel = 0
+    for i, rel in enumerate(relevance):
+        curr_rel += rel - (0 if i < num_words_to_show else relevance[i - num_words_to_show])
+        if curr_rel >= max_rel:
+            max_rel = curr_rel
+            max_rel_ind = i
+    return '<br>{title}<br>{url}<br>{continuation}{content}{continuation}<br>'.format(title=title, url=url,
+                                    continuation='' if intent == 'papers' else '...',
+                                    content=' '.join(content[max(0, max_rel_ind - num_words_to_show) : max_rel_ind]))
 
 
 class Interface(BaseWidget):
@@ -61,12 +74,12 @@ class Interface(BaseWidget):
             self._pages_displayed, self._papers_displayed = process_query(query)
 
             self._pages_result.clear()
-            self._pages_result.value = [(QtGui.QLabel(format_text(query, document)),)
+            self._pages_result.value = [(QtGui.QLabel(format_text(query, document, 'pages')),)
                                         for document in self._pages_displayed]
             self._pages_result.resizeRowsToContents()
 
             self._papers_result.clear()
-            self._papers_result.value = [(QtGui.QLabel(format_text(query, document)),)
+            self._papers_result.value = [(QtGui.QLabel(format_text(query, document, 'papers')),)
                                         for document in self._papers_displayed]
             self._papers_result.resizeRowsToContents()
 
