@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>graph</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+            margin-left: 10%;
+        }
+
+        input[type='text'] {
+            width: 40%;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <form id="searchForm">
+    	    <input type="text" placeholder="Enter the vertex name" id="searchInput">
+    	    <button>Search</button>
+    	</form>
+    </div>
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/lib/arbor.js"></script>
+    <script src="js/lib/arbor-tween.js"></script>
+    <script src="js/lib/graphics.js"></script>
+    <script src="js/lib/renderer.js"></script>
+    <canvas id="viewport" width="1000" height="800"></canvas>
+    <script src="js/data.js"></script>
+    <script src="js/graph.js"></script>
+</body>
+</html>
