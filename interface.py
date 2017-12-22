@@ -9,6 +9,7 @@ from webbrowser import open as open_url
 
 from ranging import Ranging
 from nltk import PorterStemmer
+from nltk.corpus import stopwords
 
 ranging = Ranging()
 process_query = ranging.process_query
@@ -25,8 +26,9 @@ def format_text(query, document, intent, num_words_to_show=10):
     content = []
     stemmer = PorterStemmer()
     relevance = []
+    stop = set(stopwords.words('english'))
     for num, word in enumerate(document['content'].split(' ')):
-        if stemmer.stem(word.lower()).encode("utf8") in query:
+        if word.lower() not in stop and stemmer.stem(word.lower()).encode("utf8") in query:
             content.append('<span style="background-color: #ffffcc">' + word + '</span>')
             relevance.append(1)
         else:
@@ -42,7 +44,8 @@ def format_text(query, document, intent, num_words_to_show=10):
             max_rel_ind = i
     return '<br>{title}<br>{url}<br>{continuation}{content}{continuation}<br>'.format(title=title, url=url,
                                     continuation='' if intent == 'papers' else '...',
-                                    content=' '.join(content[max(0, max_rel_ind - num_words_to_show) : max_rel_ind]))
+                                    content=document['content'] if intent == 'papers' else
+                                            ' '.join(content[max(0, max_rel_ind - num_words_to_show) : max_rel_ind]))
 
 
 class Interface(BaseWidget):
@@ -60,7 +63,7 @@ class Interface(BaseWidget):
         self._pages_result.currentCellChanged = self.__page_selected
         self._pages_displayed = []
 
-        self._papers_result = ControlList('Found papers:')
+        self._papers_result = ControlList('Found papers (by author):')
         self._papers_result.readOnly = True
         self._papers_result.currentCellChanged = self.__paper_selected
         self._papers_displayed = []
@@ -71,7 +74,7 @@ class Interface(BaseWidget):
         if e.key() == QtCore.Qt.Key_Return:
 
             query = query_words(self._query.value)
-            self._pages_displayed, self._papers_displayed = process_query(query)
+            self._pages_displayed, self._papers_displayed = process_query(query, self._query.value)
 
             self._pages_result.clear()
             self._pages_result.value = [(QtGui.QLabel(format_text(query, document, 'pages')),)
